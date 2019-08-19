@@ -1,0 +1,2 @@
+0 7 * * * curl --silent https://SECURED/pos-reports/stock-report.php
+2 7 * * * php /SECURED/pos-reports/stock-mailer.php
