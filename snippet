@@ -1,0 +1,36 @@
+//START JS
+global $woocommerce;
+$orderData = new WC_Order( $order );
+$product_list = '';
+$order_item = $orderData->get_items();
+foreach( $order_item as $product ) {
+  $prodct_name = $product['name'];
+  $prodct_qty = $product['quantity'];
+  $prodct_id = $product['product_id'];
+  $prodct_var_id = $product['variation_id'];
+  if ($product_variation_id) {
+    $thisProduct = new WC_Product($prodct_var_id);
+  } else {
+    $thisProduct = new WC_Product($prodct_id);
+  }
+  $prodct_date = date('Y-m-d');
+  $prodct_sku = $thisProduct->get_sku();
+  //START DB
+  $mysql_username = 'SECURED';
+  $mysql_password = 'SECURED';
+  $mysql_hostname = 'SECURED';
+  $mysql_database = 'SECURED';
+  $CSVconn = new mysqli($mysql_hostname, $mysql_username, $mysql_password, $mysql_database);
+  $CSVsql = "INSERT INTO pos_reports (date, name, sku, quantity) VALUES ('".$prodct_date."', '".$prodct_name."', '".$prodct_sku."', '".$prodct_qty."')
+    ON DUPLICATE KEY UPDATE quantity = quantity + ".$prodct_qty.";";
+  $CSVconn->query($CSVsql);
+  $CSVconn->close();
+  //END DB
+   $thisCSV = $prodct_date . "," . $prodct_name . "," . $prodct_sku . "," . $prodct_qty. "\n";
+   $product_list .= $thisCSV;
+}
+//Debug Write to File
+//$posOrders = fopen("SECURED/htdocs/pos_orders", "w") or die("Unable to open file!");
+//fwrite($posOrders, $product_list);
+//fclose($posOrders);
+//END JS
